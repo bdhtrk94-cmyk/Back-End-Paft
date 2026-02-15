@@ -24,8 +24,8 @@ export class ProductsController {
 
   // ── Public ───────────────────────────────────────────
 
-  @Get()
-  findAll(
+  @Get('public')
+  findAllPublic(
     @Query('category') category?: string,
     @Query('search') search?: string,
     @Query('sort') sort?: string,
@@ -41,36 +41,43 @@ export class ProductsController {
     });
   }
 
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.productsService.findOne(id);
+  @Get('public/:id')
+  findOnePublic(@Param('id', ParseIntPipe) id: number) {
+    return this.productsService.findOne(id, false); // Only active products for public
   }
 
   // ── Admin (protected) ────────────────────────────────
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @Get('admin/all')
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @Get()
   findAllForAdmin() {
     return this.productsService.findAllForAdmin();
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @Get(':id')
+  findOneForAdmin(@Param('id', ParseIntPipe) id: number) {
+    return this.productsService.findOne(id, true); // Include deleted products for admin
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @Post()
   create(@Body() dto: CreateProductDto) {
     return this.productsService.create(dto);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @Patch(':id')
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateProductDto) {
     return this.productsService.update(id, dto);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.productsService.remove(id);

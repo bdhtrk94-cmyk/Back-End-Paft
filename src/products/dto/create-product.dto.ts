@@ -52,6 +52,10 @@ export class CreateProductDto {
   @IsOptional()
   inStock?: boolean;
 
+  @IsNumber()
+  @IsOptional()
+  stockQuantity?: number;
+
   @IsString()
   @IsNotEmpty()
   description: string;
@@ -67,4 +71,45 @@ export class CreateProductDto {
   @IsString()
   @IsOptional()
   fullDescriptionAr?: string;
+
+  // Pallet-specific fields
+  @IsString()
+  @IsOptional()
+  slug?: string;
+
+  @IsString()
+  @IsOptional()
+  dimensions?: string;
+
+  @IsString()
+  @IsOptional()
+  design?: string;
+
+  @IsString()
+  @IsOptional()
+  weight?: string;
+
+  @IsString()
+  @IsOptional()
+  staticLoad?: string;
+
+  @IsString()
+  @IsOptional()
+  dynamicLoad?: string;
+
+  @IsString()
+  @IsOptional()
+  rackLoad?: string;
+
+  @IsString()
+  @IsOptional()
+  expectedLife?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  isActive?: boolean;
+
+  @IsNumber()
+  @IsOptional()
+  sortOrder?: number;
 }

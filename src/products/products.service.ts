@@ -26,6 +26,9 @@ export class ProductsService {
   }): Promise<Product[]> {
     const qb = this.productRepository.createQueryBuilder('product');
 
+    // Only include non-deleted products for public API
+    qb.where('product.deletedAt IS NULL');
+
     if (query?.category && query.category !== 'All') {
       qb.andWhere('product.category = :category', { category: query.category });
     }
@@ -67,8 +70,11 @@ export class ProductsService {
     return qb.getMany();
   }
 
-  async findOne(id: number): Promise<Product> {
-    const product = await this.productRepository.findOne({ where: { id } });
+  async findOne(id: number, includeDeleted = false): Promise<Product> {
+    const product = await this.productRepository.findOne({ 
+      where: { id },
+      withDeleted: includeDeleted
+    });
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
@@ -76,19 +82,25 @@ export class ProductsService {
   }
 
   async update(id: number, dto: UpdateProductDto): Promise<Product> {
-    const product = await this.findOne(id);
+    const product = await this.findOne(id, true); // Include deleted products for admin operations
     Object.assign(product, dto);
     return this.productRepository.save(product);
   }
 
   async remove(id: number): Promise<void> {
-    const product = await this.findOne(id);
-    await this.productRepository.softRemove(product);
+    console.log(`Attempting to permanently delete product with ID: ${id}`);
+    const product = await this.findOne(id, true); // Include deleted products for admin operations
+    console.log(`Found product: ${product.name}`);
+    await this.productRepository.delete(id); // Hard delete instead of soft delete
+    console.log(`Product ${id} permanently deleted successfully`);
   }
 
   async findAllForAdmin(): Promise<Product[]> {
-    // Return all products including soft-deleted ones for admin
-    return this.productRepository.find({ withDeleted: true });
+    // Return only active products for admin (no soft-deleted products since we use hard delete)
+    const products = await this.productRepository.find();
+    console.log(`Found ${products.length} products for admin`);
+    console.log('Products:', products.map(p => ({ id: p.id, name: p.name })));
+    return products;
   }
 
   async count(): Promise<number> {
