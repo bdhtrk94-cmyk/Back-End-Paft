@@ -1,0 +1,272 @@
+import { DataSource } from 'typeorm';
+import { Product } from '../products/entities/product.entity';
+
+export async function clearAndSeedPallets(dataSource: DataSource) {
+  const productRepository = dataSource.getRepository(Product);
+
+  console.log('Clearing existing products...');
+  const existingProducts = await productRepository.find();
+  if (existingProducts.length > 0) {
+    await productRepository.remove(existingProducts);
+  }
+
+  console.log('Seeding pallet products...');
+
+  const palletProducts = [
+    // Heavy Duty Pallets
+    {
+      name: 'M1 Heavy Duty Pallet',
+      slug: 'm1-heavy-duty',
+      category: 'heavy-duty',
+      description: 'Premium heavy duty pallet with 3 SKID design',
+      image: 'https://paft.eg/wp-content/uploads/2025/11/Screenshot_2025-11-26_212516-removebg-preview.png',
+      dimensions: '1000 × 1200 × 150 mm',
+      design: '3 SKID',
+      staticLoad: 'Up to 10.0 Tons',
+      dynamicLoad: 'Up to 4.0 Tons',
+      rackLoad: 'Up to 1.75 Tons',
+      expectedLife: 'Up to 10 Years',
+      price: 0,
+      isActive: true,
+      sortOrder: 1,
+      inStock: true,
+      stockQuantity: 100,
+      rating: 0,
+      reviewCount: 0,
+    },
+    {
+      name: 'M2 Heavy Duty Pallet',
+      slug: 'm2-heavy-duty',
+      category: 'heavy-duty',
+      description: 'Heavy duty pallet with enhanced capacity',
+      image: 'https://paft.eg/wp-content/uploads/2025/11/Screenshot_2025-11-26_212441-removebg-preview.png',
+      dimensions: '1100 × 1300 × 150 mm',
+      design: '3 SKID',
+      staticLoad: 'Up to 8.0 Tons',
+      dynamicLoad: 'Up to 3.0 Tons',
+      rackLoad: 'Up to 2 Tons',
+      expectedLife: 'Up to 10 Years',
+      price: 0,
+      isActive: true,
+      sortOrder: 2,
+      inStock: true,
+      stockQuantity: 100,
+      rating: 0,
+      reviewCount: 0,
+    },
+    {
+      name: 'M4 Heavy Duty Pallet',
+      slug: 'm4-heavy-duty',
+      category: 'heavy-duty',
+      description: 'Double face design for versatile applications',
+      image: 'https://paft.eg/wp-content/uploads/2025/11/Screenshot_2025-11-26_212558-removebg-preview.png',
+      dimensions: '1000 × 1200 × 150 mm',
+      design: 'Double Face',
+      staticLoad: 'Up to 6.0 Tons',
+      dynamicLoad: 'Up to 2.5 Tons',
+      rackLoad: 'Up to 1.5 Tons',
+      expectedLife: 'Up to 10 Years',
+      price: 0,
+      isActive: true,
+      sortOrder: 3,
+      inStock: true,
+      stockQuantity: 100,
+      rating: 0,
+      reviewCount: 0,
+    },
+    {
+      name: 'M5 Heavy Duty Pallet',
+      slug: 'm5-heavy-duty',
+      category: 'heavy-duty',
+      description: 'Compact heavy duty pallet',
+      image: 'https://paft.eg/wp-content/uploads/2025/11/Screenshot_2025-11-26_212704-removebg-preview.png',
+      dimensions: '800 × 1200 × 150 mm',
+      design: '3 SKID',
+      staticLoad: 'Up to 8.0 Tons',
+      dynamicLoad: 'Up to 3 Tons',
+      rackLoad: 'Up to 1.75 Tons',
+      expectedLife: 'Up to 10 Years',
+      price: 0,
+      isActive: true,
+      sortOrder: 4,
+      inStock: true,
+      stockQuantity: 100,
+      rating: 0,
+      reviewCount: 0,
+    },
+    {
+      name: 'M6 Heavy Duty Pallet',
+      slug: 'm6-heavy-duty',
+      category: 'heavy-duty',
+      description: 'High capacity heavy duty pallet',
+      image: 'https://paft.eg/wp-content/uploads/2025/11/Screenshot_2025-11-26_212637-removebg-preview.png',
+      dimensions: '1000 × 1200 × 150 mm',
+      design: '3 SKID',
+      staticLoad: 'Up to 10.0 Tons',
+      dynamicLoad: 'Up to 4.0 Tons',
+      rackLoad: 'Up to 2.0 Tons',
+      expectedLife: 'Up to 10 Years',
+      price: 0,
+      isActive: true,
+      sortOrder: 5,
+      inStock: true,
+      stockQuantity: 100,
+      rating: 0,
+      reviewCount: 0,
+    },
+    {
+      name: 'M7 Heavy Duty Pallet',
+      slug: 'm7-heavy-duty',
+      category: 'heavy-duty',
+      description: 'Square heavy duty pallet',
+      image: 'https://paft.eg/wp-content/uploads/2025/11/Screenshot_2025-11-26_212322-removebg-preview.png',
+      dimensions: '1200 × 1200 × 150 mm',
+      design: '3 SKID',
+      staticLoad: 'Up to 10.0 Tons',
+      dynamicLoad: 'Up to 4.0 Tons',
+      rackLoad: 'Up to 2.0 Tons',
+      expectedLife: 'Up to 10 Years',
+      price: 0,
+      isActive: true,
+      sortOrder: 6,
+      inStock: true,
+      stockQuantity: 100,
+      rating: 0,
+      reviewCount: 0,
+    },
+    {
+      name: 'M8 Heavy Duty Pallet',
+      slug: 'm8-heavy-duty',
+      category: 'heavy-duty',
+      description: 'Compact square heavy duty pallet',
+      image: 'https://paft.eg/wp-content/uploads/2025/11/Screenshot_2025-11-26_212322-removebg-preview.png',
+      dimensions: '1140 × 1140 × 150 mm',
+      design: '3 SKID',
+      staticLoad: 'Up to 10.0 Tons',
+      dynamicLoad: 'Up to 4.0 Tons',
+      rackLoad: 'Up to 2 Tons',
+      expectedLife: 'Up to 10 Years',
+      price: 0,
+      isActive: true,
+      sortOrder: 7,
+      inStock: true,
+      stockQuantity: 100,
+      rating: 0,
+      reviewCount: 0,
+    },
+    {
+      name: 'M9 Heavy Duty Pallet',
+      slug: 'm9-heavy-duty',
+      category: 'heavy-duty',
+      description: 'Medium square heavy duty pallet',
+      image: 'https://paft.eg/wp-content/uploads/2025/11/Screenshot_2025-11-26_212516-removebg-preview.png',
+      dimensions: '1100 × 1100 × 150 mm',
+      design: '3 SKID',
+      staticLoad: 'Up to 10.0 Tons',
+      dynamicLoad: 'Up to 4.0 Tons',
+      rackLoad: 'Up to 2 Tons',
+      expectedLife: 'Up to 10 Years',
+      price: 0,
+      isActive: true,
+      sortOrder: 8,
+      inStock: true,
+      stockQuantity: 100,
+      rating: 0,
+      reviewCount: 0,
+    },
+
+    // Light Duty Pallets
+    {
+      name: 'Double Deck Light Pallet',
+      slug: 'double-deck-light',
+      category: 'light-duty',
+      description: 'Export grade double deck pallet',
+      image: 'https://paft.eg/wp-content/uploads/2025/11/WhatsApp_Image_2025-11-25_at_11.31.19_AM-removebg-preview.png',
+      dimensions: '1000 × 1200 × 130 mm',
+      design: 'Double Deck',
+      weight: '7.2 kg',
+      staticLoad: '1 Ton',
+      dynamicLoad: '1 Ton',
+      rackLoad: 'Non-Rackable',
+      expectedLife: 'Export Grade',
+      price: 8,
+      isActive: true,
+      sortOrder: 9,
+      inStock: true,
+      stockQuantity: 100,
+      rating: 0,
+      reviewCount: 0,
+    },
+    {
+      name: '9 Leg Light Pallet',
+      slug: '9-leg-light',
+      category: 'light-duty',
+      description: 'Lightweight 9-leg design pallet',
+      image: 'https://paft.eg/wp-content/uploads/2025/11/WhatsApp_Image_2025-11-25_at_11.45.00_AM-removebg-preview.png',
+      dimensions: '1000 × 1200 × 140 mm',
+      design: '9-Leg',
+      weight: '5.5 kg',
+      staticLoad: '0.75 Ton',
+      dynamicLoad: '0.75 Ton',
+      rackLoad: 'Non-Rackable',
+      expectedLife: 'Export Grade',
+      price: 8,
+      isActive: true,
+      sortOrder: 10,
+      inStock: true,
+      stockQuantity: 100,
+      rating: 0,
+      reviewCount: 0,
+    },
+
+    // Rental Pallet
+    {
+      name: 'Rental Pallet',
+      slug: 'rental-pallet',
+      category: 'rental',
+      description: 'Premium rental pallet with long lifespan',
+      image: 'https://paft.eg/wp-content/uploads/2025/11/output-onlinepngtools.png',
+      dimensions: '1000 × 1200 × 150 mm',
+      design: 'Heavy Duty',
+      staticLoad: 'Up to 10.0 Tons',
+      dynamicLoad: 'Up to 4.0 Tons',
+      rackLoad: 'Up to 2.0 Tons',
+      expectedLife: '10+ Years',
+      price: 0,
+      isActive: true,
+      sortOrder: 11,
+      inStock: true,
+      stockQuantity: 100,
+      rating: 0,
+      reviewCount: 0,
+    },
+  ];
+
+  await productRepository.save(palletProducts);
+  console.log(`Successfully seeded ${palletProducts.length} pallet products!`);
+}
+
+// Run this script directly
+if (require.main === module) {
+  import('typeorm').then(async ({ DataSource }) => {
+    const dataSource = new DataSource({
+      type: 'mysql',
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || '3306'),
+      username: process.env.DB_USERNAME || 'root',
+      password: process.env.DB_PASSWORD || '',
+      database: process.env.DB_DATABASE || 'paft_cms',
+      entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+      synchronize: false,
+    });
+
+    try {
+      await dataSource.initialize();
+      await clearAndSeedPallets(dataSource);
+      await dataSource.destroy();
+    } catch (error) {
+      console.error('Error seeding pallet products:', error);
+      process.exit(1);
+    }
+  });
+}
