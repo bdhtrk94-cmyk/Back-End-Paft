@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 import { SiteContent } from './entities/site-content.entity';
 import { CreateSiteContentDto } from './dto/create-site-content.dto';
 import { UpdateSiteContentDto } from './dto/update-site-content.dto';
@@ -10,7 +10,7 @@ export class SiteContentService {
   constructor(
     @InjectRepository(SiteContent)
     private readonly repo: Repository<SiteContent>,
-  ) {}
+  ) { }
 
   async create(dto: CreateSiteContentDto): Promise<SiteContent> {
     const item = this.repo.create(dto);
@@ -42,6 +42,15 @@ export class SiteContentService {
       throw new NotFoundException(`SiteContent with key "${key}" not found`);
     }
     return item;
+  }
+
+  async findByPrefix(prefix: string): Promise<SiteContent[]> {
+    return this.repo.find({
+      where: {
+        sectionKey: Like(`${prefix}%`),
+        isDraft: false,
+      },
+    });
   }
 
   async update(id: number, dto: UpdateSiteContentDto): Promise<SiteContent> {

@@ -20,7 +20,7 @@ import { UserRole } from '../users/entities/user.entity';
 
 @Controller('site-content')
 export class SiteContentController {
-  constructor(private readonly siteContentService: SiteContentService) {}
+  constructor(private readonly siteContentService: SiteContentService) { }
 
   // ── Public ──────────────────────────────────────────
 
@@ -37,6 +37,11 @@ export class SiteContentController {
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.siteContentService.findOne(id);
+  }
+
+  @Get('prefix/:prefix')
+  findByPrefix(@Param('prefix') prefix: string) {
+    return this.siteContentService.findByPrefix(prefix);
   }
 
   // ── Admin (protected) ──────────────────────────────
