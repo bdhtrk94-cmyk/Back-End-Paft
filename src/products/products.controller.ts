@@ -20,7 +20,7 @@ import { UserRole } from '../users/entities/user.entity';
 
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(private readonly productsService: ProductsService) { }
 
   // ── Public ───────────────────────────────────────────
 
@@ -40,6 +40,16 @@ export class ProductsController {
       maxPrice: maxPrice ? Number(maxPrice) : undefined,
     });
   }
+
+  /**
+   * Public endpoint that returns ALL products including soft-deleted ones.
+   * Used by the Plastic Pallets page so admin deletions don't affect it.
+   */
+  @Get('public/all')
+  findAllPublicIncludingDeleted(@Query('category') category?: string) {
+    return this.productsService.findAllIncludingDeleted({ category });
+  }
+
 
   @Get('public/:id')
   findOnePublic(@Param('id', ParseIntPipe) id: number) {

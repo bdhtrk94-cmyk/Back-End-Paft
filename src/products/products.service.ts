@@ -10,7 +10,7 @@ export class ProductsService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
-  ) {}
+  ) { }
 
   async create(dto: CreateProductDto): Promise<Product> {
     const product = this.productRepository.create(dto);
@@ -71,7 +71,7 @@ export class ProductsService {
   }
 
   async findOne(id: number, includeDeleted = false): Promise<Product> {
-    const product = await this.productRepository.findOne({ 
+    const product = await this.productRepository.findOne({
       where: { id },
       withDeleted: includeDeleted
     });
@@ -88,11 +88,11 @@ export class ProductsService {
   }
 
   async remove(id: number): Promise<void> {
-    console.log(`Attempting to permanently delete product with ID: ${id}`);
+    console.log(`Attempting to soft-delete product with ID: ${id}`);
     const product = await this.findOne(id, true); // Include deleted products for admin operations
     console.log(`Found product: ${product.name}`);
-    await this.productRepository.delete(id); // Hard delete instead of soft delete
-    console.log(`Product ${id} permanently deleted successfully`);
+    await this.productRepository.softRemove(product); // Soft delete — sets deletedAt
+    console.log(`Product ${id} soft-deleted successfully`);
   }
 
   async findAllForAdmin(): Promise<Product[]> {
@@ -105,5 +105,19 @@ export class ProductsService {
 
   async count(): Promise<number> {
     return this.productRepository.count();
+  }
+
+  /**
+   * Returns ALL products (including soft-deleted) for the Plastic Pallets page.
+   * This ensures admin deletions only affect the Shop page.
+   */
+  async findAllIncludingDeleted(query?: { category?: string }): Promise<Product[]> {
+    const qb = this.productRepository.createQueryBuilder('product');
+    qb.withDeleted(); // Include soft-deleted products
+    if (query?.category) {
+      qb.andWhere('product.category = :category', { category: query.category });
+    }
+    qb.orderBy('product.sortOrder', 'ASC');
+    return qb.getMany();
   }
 }

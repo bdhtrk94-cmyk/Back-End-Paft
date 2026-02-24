@@ -17,7 +17,7 @@ export class Content {
   @Column({ type: 'text' })
   value: string; // The actual content
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', nullable: true, name: 'valueAr' })
   valueAr?: string; // Arabic content (optional for future)
 
   @Column({ type: 'int', default: 0 })

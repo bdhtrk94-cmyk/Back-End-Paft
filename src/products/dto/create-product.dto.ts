@@ -6,6 +6,7 @@ import {
   IsBoolean,
   Min,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateProductDto {
   @IsString()
@@ -16,18 +17,22 @@ export class CreateProductDto {
   @IsOptional()
   nameAr?: string;
 
+  @Transform(({ value }) => value != null ? Number(value) : value)
   @IsNumber()
   @Min(0)
   price: number;
 
+  @Transform(({ value }) => value != null ? Number(value) : value)
   @IsNumber()
   @IsOptional()
   originalPrice?: number;
 
+  @Transform(({ value }) => value != null ? Number(value) : value)
   @IsNumber()
   @IsOptional()
   rating?: number;
 
+  @Transform(({ value }) => value != null ? Number(value) : value)
   @IsNumber()
   @IsOptional()
   reviewCount?: number;
@@ -48,10 +53,12 @@ export class CreateProductDto {
   @IsOptional()
   badge?: string;
 
+  @Transform(({ value }) => value === 'true' || value === true)
   @IsBoolean()
   @IsOptional()
   inStock?: boolean;
 
+  @Transform(({ value }) => value != null ? Number(value) : value)
   @IsNumber()
   @IsOptional()
   stockQuantity?: number;
@@ -105,10 +112,12 @@ export class CreateProductDto {
   @IsOptional()
   expectedLife?: string;
 
+  @Transform(({ value }) => value === 'true' || value === true)
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
 
+  @Transform(({ value }) => value != null ? Number(value) : value)
   @IsNumber()
   @IsOptional()
   sortOrder?: number;

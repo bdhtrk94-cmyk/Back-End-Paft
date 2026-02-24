@@ -18,7 +18,7 @@ import { UserRole } from '../users/entities/user.entity';
 
 @Controller('content')
 export class ContentController {
-  constructor(private readonly contentService: ContentService) {}
+  constructor(private readonly contentService: ContentService) { }
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -47,10 +47,13 @@ export class ContentController {
   @Patch('bulk-update')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
-  async bulkUpdate(@Body() updates: { id: number; value: string }[]) {
-    const updatePromises = updates.map(update => 
-      this.contentService.update(update.id, { value: update.value })
-    );
+  async bulkUpdate(@Body() updates: { id: number; value?: string; valueAr?: string }[]) {
+    const updatePromises = updates.map(update => {
+      const payload: { value?: string; valueAr?: string } = {};
+      if (update.value !== undefined) payload.value = update.value;
+      if (update.valueAr !== undefined) payload.valueAr = update.valueAr;
+      return this.contentService.update(update.id, payload);
+    });
     return Promise.all(updatePromises);
   }
 
