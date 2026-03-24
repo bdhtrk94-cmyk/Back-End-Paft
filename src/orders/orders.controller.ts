@@ -18,7 +18,7 @@ import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 @Controller('orders')
 @UseGuards(JwtAuthGuard)
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(private readonly ordersService: OrdersService) { }
 
   /**
    * POST /api/orders/checkout
@@ -27,10 +27,11 @@ export class OrdersController {
   @Post('checkout')
   @Throttle({ default: { ttl: 60000, limit: 5 } })
   async checkout(@Request() req, @Body() dto: CreateOrderDto) {
-    const order = await this.ordersService.checkout(req.user.id, dto);
+    const { order, clientSecret } = await this.ordersService.checkout(req.user.id, dto);
     // Return only safe fields — no sensitive data leaks
     return {
       message: 'Order placed successfully',
+      clientSecret,
       order: {
         id: order.id,
         status: order.status,

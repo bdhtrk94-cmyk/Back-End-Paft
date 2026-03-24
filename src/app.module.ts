@@ -11,6 +11,7 @@ import { SiteContentModule } from './site-content/site-content.module';
 import { OrdersModule } from './orders/orders.module';
 import { AdminModule } from './admin/admin.module';
 import { ContentModule } from './content/content.module';
+import { StripeModule } from './stripe/stripe.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { ContentModule } from './content/content.module';
     OrdersModule,
     AdminModule,
     ContentModule,
+    StripeModule,
   ],
   providers: [
     // Apply rate limiting globally

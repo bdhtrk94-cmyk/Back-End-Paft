@@ -5,11 +5,15 @@ import { OrderItem } from './entities/order-item.entity';
 import { Product } from '../products/entities/product.entity';
 import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
+import { StripeModule } from '../stripe/stripe.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Order, OrderItem, Product])],
+  imports: [
+    TypeOrmModule.forFeature([Order, OrderItem, Product]),
+    StripeModule,
+  ],
   controllers: [OrdersController],
   providers: [OrdersService],
   exports: [OrdersService],
 })
-export class OrdersModule {}
+export class OrdersModule { }

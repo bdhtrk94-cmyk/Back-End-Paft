@@ -58,6 +58,14 @@ export class Order {
   @Column({ name: 'payment_intent_id', length: 255, nullable: true })
   paymentIntentId: string;
 
+  @Column({
+    name: 'payment_status',
+    type: 'varchar',
+    length: 20,
+    default: 'pending',
+  })
+  paymentStatus: string;
+
   @OneToMany(() => OrderItem, (item) => item.order, {
     cascade: true,
     eager: true,

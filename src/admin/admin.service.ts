@@ -12,7 +12,7 @@ export class AdminService {
     private readonly productsService: ProductsService,
     private readonly pagesService: PagesService,
     private readonly siteContentService: SiteContentService,
-  ) {}
+  ) { }
 
   async getDashboardStats() {
     const [usersCount, productsCount, pagesCount, contentCount] = await Promise.all([
@@ -55,6 +55,10 @@ export class AdminService {
       throw new BadRequestException('Cannot modify super admin role - this account is protected');
     }
 
+    if (newRole === UserRole.SUPER_ADMIN) {
+      throw new BadRequestException('Cannot assign super admin role to any user. Only one super admin is allowed.');
+    }
+
     if (user.role === newRole) {
       throw new BadRequestException('User already has this role');
     }
@@ -80,7 +84,7 @@ export class AdminService {
       if ((adminCount + superAdminCount) <= 1) {
         throw new BadRequestException('Cannot delete the last admin user');
       }
-      
+
       // Additional protection for super admin accounts
       if (user.role === UserRole.SUPER_ADMIN) {
         throw new BadRequestException('Cannot delete super admin account - super admin accounts are protected');
@@ -95,6 +99,10 @@ export class AdminService {
     const existingUser = await this.usersService.findByEmail(userData.email);
     if (existingUser) {
       throw new BadRequestException('User with this email already exists');
+    }
+
+    if (userData.role === UserRole.SUPER_ADMIN) {
+      throw new BadRequestException('Cannot create a user with super admin role. Only one super admin is allowed.');
     }
 
     return this.usersService.create(userData);

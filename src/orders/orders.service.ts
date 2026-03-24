@@ -11,6 +11,7 @@ import { Order, OrderStatus } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { Product } from '../products/entities/product.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { StripeService } from '../stripe/stripe.service';
 
 /**
  * Valid order status transitions.
@@ -37,7 +38,8 @@ export class OrdersService {
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
     private readonly dataSource: DataSource,
-  ) {}
+    private readonly stripeService: StripeService,
+  ) { }
 
   /**
    * Secure checkout with full server-side validation.
@@ -47,7 +49,7 @@ export class OrdersService {
    * - Stock validation and decrement
    * - priceAtPurchase freezing
    */
-  async checkout(userId: number, dto: CreateOrderDto): Promise<Order> {
+  async checkout(userId: number, dto: CreateOrderDto): Promise<{ order: Order; clientSecret: string }> {
     this.logger.log(
       `Checkout attempt | userId=${userId} | items=${dto.items.length} | idempotencyKey=${dto.idempotencyKey}`,
     );
@@ -61,7 +63,13 @@ export class OrdersService {
       this.logger.warn(
         `Idempotency hit | userId=${userId} | orderId=${existingOrder.id} | key=${dto.idempotencyKey}`,
       );
-      return existingOrder; // Return the same order — prevents duplicate payments
+      // Re-create PaymentIntent for the existing order (idempotent via key prefix)
+      const { clientSecret } = await this.stripeService.createPaymentIntent(
+        Number(existingOrder.totalAmount),
+        { orderId: String(existingOrder.id), userId: String(userId) },
+        dto.idempotencyKey,
+      );
+      return { order: existingOrder, clientSecret };
     }
 
     // ── 2. Validate items array ──────────────────────────
@@ -165,13 +173,24 @@ export class OrdersService {
         `Checkout success | userId=${userId} | orderId=${savedOrder.id} | total=${totalAmount} | items=${orderItems.length}`,
       );
 
+      // ── 9. Create Stripe PaymentIntent ─────────────────
+      const { clientSecret, paymentIntentId } =
+        await this.stripeService.createPaymentIntent(
+          totalAmount,
+          { orderId: String(savedOrder.id), userId: String(userId) },
+          dto.idempotencyKey,
+        );
+
+      // Save paymentIntentId on order (non-transactional, order already committed)
+      await this.orderRepository.update(savedOrder.id, { paymentIntentId });
+
       // Return the complete order with items
       const result = await this.orderRepository.findOne({
         where: { id: savedOrder.id },
         relations: ['items', 'items.product'],
       });
 
-      return result!;
+      return { order: result!, clientSecret };
     } catch (error) {
       // Rollback on any failure
       await queryRunner.rollbackTransaction();

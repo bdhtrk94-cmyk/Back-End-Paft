@@ -14,7 +14,7 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async register(registerDto: RegisterDto) {
     // Check if user already exists
@@ -84,6 +84,82 @@ export class AuthService {
       throw new UnauthorizedException('User not found');
     }
     return user;
+  }
+
+  async getProfile(userId: number) {
+    const user = await this.validateUser(userId);
+    return {
+      user: this.sanitizeUser(user),
+    };
+  }
+
+  async updateProfile(
+    userId: number,
+    data: { name?: string; phone?: string; bio?: string },
+  ) {
+    const user = await this.usersService.findById(userId);
+    if (!user) throw new UnauthorizedException('User not found');
+
+    if (data.name) user.name = data.name;
+    if (data.phone !== undefined) user.phone = data.phone;
+    if (data.bio !== undefined) user.bio = data.bio;
+
+    const updated = await this.usersService.update(userId, {
+      name: user.name,
+      phone: user.phone,
+      bio: user.bio,
+    });
+
+    return {
+      message: 'Profile updated successfully',
+      user: this.sanitizeUser(updated!),
+    };
+  }
+
+  async changePassword(
+    userId: number,
+    currentPassword: string,
+    newPassword: string,
+  ) {
+    const user = await this.usersService.findById(userId);
+    if (!user) throw new UnauthorizedException('User not found');
+
+    const isValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isValid) {
+      throw new UnauthorizedException('Current password is incorrect');
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    await this.usersService.update(userId, { password: hashed });
+
+    return { message: 'Password changed successfully' };
+  }
+
+  async updateAvatar(userId: number, avatarPath: string) {
+    const user = await this.usersService.findById(userId);
+    if (!user) throw new UnauthorizedException('User not found');
+
+    await this.usersService.update(userId, { avatar: avatarPath });
+    const updated = await this.usersService.findById(userId);
+
+    return {
+      message: 'Avatar updated successfully',
+      user: this.sanitizeUser(updated!),
+    };
+  }
+
+  private sanitizeUser(user: any) {
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      phone: user.phone || null,
+      bio: user.bio || null,
+      avatar: user.avatar || null,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
   }
 
   private generateToken(userId: number, email: string, role: string): string {

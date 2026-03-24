@@ -33,6 +33,15 @@ export class User {
   })
   role: UserRole;
 
+  @Column({ length: 20, nullable: true, default: null })
+  phone: string;
+
+  @Column({ type: 'text', nullable: true, default: null })
+  bio: string;
+
+  @Column({ length: 500, nullable: true, default: null })
+  avatar: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
