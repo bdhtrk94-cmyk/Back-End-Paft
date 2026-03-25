@@ -12,6 +12,8 @@ import { OrdersModule } from './orders/orders.module';
 import { AdminModule } from './admin/admin.module';
 import { ContentModule } from './content/content.module';
 import { StripeModule } from './stripe/stripe.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -31,13 +33,21 @@ import { StripeModule } from './stripe/stripe.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'mysql',
-        host: configService.get<string>('DB_HOST', 'localhost'),
-        port: configService.get<number>('DB_PORT', 3306),
-        username: configService.get<string>('DB_USERNAME', 'root'),
-        password: configService.get<string>('DB_PASSWORD', ''),
-        database: configService.get<string>('DB_DATABASE', 'paft_cms'),
+        host: configService.get<string>('DB_HOST'),
+        port: parseInt(configService.get<string>('DB_PORT') || '3306'),
+        username: configService.get<string>('DB_USERNAME'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_DATABASE'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: true, // Auto-create tables (disable in production!)
+        autoLoadEntities: true,
+        synchronize: configService.get<string>('NODE_ENV') !== 'production',
+        logging: configService.get<string>('NODE_ENV') === 'development',
+        ssl: configService.get<string>('NODE_ENV') === 'production' ? { rejectUnauthorized: false } : false,
+        retryAttempts: 5,
+        retryDelay: 3000,
+        extra: {
+          connectionLimit: 10,
+        },
       }),
     }),
 
@@ -52,7 +62,9 @@ import { StripeModule } from './stripe/stripe.module';
     ContentModule,
     StripeModule,
   ],
+  controllers: [AppController],
   providers: [
+    AppService,
     // Apply rate limiting globally
     {
       provide: APP_GUARD,

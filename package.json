@@ -17,19 +17,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
-    "update:user-roles": "ts-node -r tsconfig-paths/register src/seeds/update-user-roles.ts",
-    "fix:user-roles": "ts-node -r tsconfig-paths/register src/seeds/fix-user-roles-direct.ts",
-    "force:fix-roles": "ts-node -r tsconfig-paths/register src/seeds/force-fix-roles.ts",
-    "check:table": "ts-node -r tsconfig-paths/register src/seeds/check-table-structure.ts",
-    "final:check": "ts-node -r tsconfig-paths/register src/seeds/final-check.ts",
-    "update:mohamed": "ts-node -r tsconfig-paths/register src/seeds/update-mohamed-to-user.ts",
-    "test:registration": "ts-node -r tsconfig-paths/register src/seeds/test-user-registration.ts",
-    "show:data": "ts-node -r tsconfig-paths/register src/seeds/show-all-data.ts",
-    "show:tables": "ts-node -r tsconfig-paths/register src/seeds/show-tables.ts",
-    "create:data": "ts-node -r tsconfig-paths/register src/seeds/create-initial-data.ts",
-    "update:super-admin": "ts-node -r tsconfig-paths/register src/seeds/update-admin-to-super-admin.ts",
-    "describe:tables": "ts-node -r tsconfig-paths/register src/seeds/describe-tables.ts"
+    "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
