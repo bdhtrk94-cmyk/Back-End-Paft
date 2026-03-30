@@ -37,9 +37,24 @@ async function bootstrap() {
     );
 
     // ── Security: CORS configuration ───────────────────────
-    const corsOrigin = process.env.CORS_ORIGIN;
+    const corsOriginEnv = process.env.CORS_ORIGIN || '';
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'http://127.0.0.1:3000',
+      'http://172.21.128.1:3000',
+      ...corsOriginEnv.split(',').map(o => o.trim()).filter(Boolean),
+    ];
     app.enableCors({
-      origin: corsOrigin || 'http://localhost:3000',
+      origin: (origin, callback) => {
+        // Allow requests with no origin (mobile apps, curl, Postman)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error(`CORS: origin ${origin} not allowed`));
+        }
+      },
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
       credentials: true,
     });
@@ -61,17 +76,20 @@ async function bootstrap() {
       }),
     );
 
-    const port = process.env.PORT || 3000;
+    // MonsterASP.NET: IIS provides PORT via HTTP_PLATFORM_PORT
+    const port = process.env.PORT || process.env.HTTP_PLATFORM_PORT || 3000;
     await app.listen(port, '0.0.0.0');
     logger.log(`🚀 PAFT CMS API is running on port: ${port}`);
-    logger.log(`📋 Health check: http://localhost:${port}/api/health`);
+    logger.log(`📋 Health check: /api/health`);
     logger.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
   } catch (error) {
+    require('fs').appendFileSync('startup-error.txt', `[${new Date().toISOString()}] Failed to start application: ${error?.stack || error}\n`);
     console.error('❌ Failed to start application:', error);
     process.exit(1);
   }
 }
 bootstrap().catch((error) => {
+  require('fs').appendFileSync('startup-error.txt', `[${new Date().toISOString()}] Bootstrap failed: ${error?.stack || error}\n`);
   console.error('❌ Bootstrap failed:', error);
   process.exit(1);
 });

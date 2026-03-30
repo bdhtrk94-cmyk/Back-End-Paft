@@ -42,7 +42,7 @@ import { AppService } from './app.service';
         autoLoadEntities: true,
         synchronize: configService.get<string>('NODE_ENV') !== 'production',
         logging: configService.get<string>('NODE_ENV') === 'development',
-        ssl: configService.get<string>('NODE_ENV') === 'production' ? { rejectUnauthorized: false } : false,
+        ssl: false, // MonsterASP MySQL server does not support SSL connections
         retryAttempts: 5,
         retryDelay: 3000,
         extra: {
